@@ -52,6 +52,7 @@
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
     flag: '<path d="M5 21V5m0 0c5-4 9 4 14 0v10c-5 4-9-4-14 0"/>',
     play: '<path d="m8 5 12 7-12 7z"/>',
+    pause: '<path d="M8 5v14M16 5v14"/>',
     calendarDays: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>',
     message: '<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',
     checkCircle: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',
@@ -72,7 +73,9 @@
 
   // Course titles and semester placement follow a publicly re-posted 1401-onward program.
   // The document does not identify a university, so it is not presented as BMSU's official chart.
-  const STUDENT_NAME = 'محمدرضا شاهی';
+  // The public demo uses a generic identity so the shared site never exposes a real student's name.
+  const STUDENT_NAME = 'دانشجوی نمونه';
+  const DEMO_CREDENTIALS = { username: 'darsban', password: 'darsban1402' };
   const curriculumSource = 'https://www.scribd.com/document/826899417/%DA%A9%D9%88%D8%B1%DB%8C%DA%A9%D9%88%D9%84%D9%88%D9%85-%D8%B9%D9%84%D9%88%D9%85-%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%D8%B4%DA%AF%D8%A7%D9%87%DB%8C-1401';
   const curriculumTerms = [
     { term: 1, items: [
@@ -198,7 +201,9 @@
     { id: 'm3', name: 'فاطمه محمدی', initial: 'ف', major: 'علوم آزمایشگاهی · پروفایل نمونه', specialty: 'ایمنی‌شناسی و بیوشیمی', tone: '', about: 'حوزهٔ همراهی پیشنهادی: مرور مباحث ایمنی‌شناسی و بیوشیمی.' }
   ];
 
-  let state = { page: 'home', tab: 'home', courseId: 'anatomy', resourceId: 'r1', mentorId: 'm1', courseTab: 'resources', courseCategory: 'همه', courseQuery: '', filter: 'همهٔ طرح‌ها', wizardStep: 1, wizardAnswers: {}, chat: store.get('chat-clean-copy-v1', []), previous: [] };
+  let state = { page: 'landing', authenticated: false, tab: 'home', courseId: 'anatomy', resourceId: 'r1', mentorId: 'm1', courseTab: 'resources', courseCategory: 'همه', courseQuery: '', filter: 'همهٔ طرح‌ها', wizardStep: 1, wizardAnswers: {}, chat: store.get('chat-clean-copy-v1', []), previous: [] };
+  let landingSlideIndex = 0;
+  let landingCarouselTimer;
   let toastTimer;
 
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -219,15 +224,25 @@
   function renderDesktopChrome() {
     const sidebar = $('#desktop-sidebar');
     if (!sidebar) return;
+    const app = $('#app');
+    app?.classList.toggle('public-mode', !state.authenticated);
+    $('#desktop-topbar')?.classList.toggle('is-hidden', !state.authenticated);
+    sidebar.classList.toggle('is-hidden', !state.authenticated);
+    if (!state.authenticated) {
+      sidebar.innerHTML = '';
+      return;
+    }
     const routes = [
       ['home', 'خانه', 'home'], ['courses', 'درس‌ها', 'book'], ['path', 'مسیر مطالعه', 'route'], ['library', 'بانک منابع', 'layers'],
       ['mentors', 'منتورینگ', 'users'], ['support', 'حمایت دانشجویی', 'heart'], ['admin', 'پایش و راهبری', 'chart']
     ];
     const active = state.page === 'course' ? 'courses' : state.page === 'resource' ? 'library' : state.page === 'mentor' ? 'mentors' : state.page;
-    sidebar.innerHTML = `<div class="desktop-brand" data-page="home">${logo()}<span><b>درس‌بان</b><small>منابع و راهبری آموزشی</small></span></div><div class="desktop-campus"><span class="campus-mark">ب</span><span><b>علوم آزمایشگاهی</b><small>دانشگاه علوم پزشکی بقیةالله (عج)</small></span></div><div class="desktop-nav-label">فضای آموزشی</div><nav class="desktop-nav">${routes.map(([route, label, glyph]) => `<button class="desktop-nav-item ${active === route ? 'active' : ''}" data-page="${route}" ${active === route ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span>${route === 'admin' ? '<i>پایلوت</i>' : ''}</button>`).join('')}</nav><div class="desktop-sidebar-spacer"></div><button class="desktop-offline" data-page="offline">${icon('bookmark')}<span><b>فهرست شخصی</b><small>عنوان‌های ذخیره‌شده</small></span>${icon('chevron')}</button><button class="desktop-profile" data-page="profile">${studentAvatar()}<span><b>${STUDENT_NAME}</b><small>ترم ۶ · ورودی ۱۴۰۲</small></span>${icon('chevron')}</button><div class="desktop-sidebar-foot">نسخهٔ نمایشی درس‌بان</div>`;
-    const titles = { home: 'فضای یادگیری', courses: 'دروس علوم آزمایشگاهی', course: 'نمای کلی درس', library: 'بانک منابع آموزشی', resource: 'جزئیات محتوا', path: 'مسیر مطالعه', mentors: 'راهنمایی و منتورینگ', mentor: 'پروفایل راهنما', support: 'حمایت دانشجویی', assistant: 'دستیار مطالعه', compass: 'قطب‌نمای برنامه‌ریزی', upload: 'پیشنهاد محتوای آموزشی', admin: 'پایش و راهبری محتوا', offline: 'فهرست شخصی', notifications: 'اعلان‌ها', profile: 'پروفایل دانشجو' };
+    sidebar.innerHTML = `<div class="desktop-brand" data-page="home">${logo()}<span><b>درس‌بان</b><small>منابع و راهبری آموزشی</small></span></div><div class="desktop-campus"><span class="campus-mark">ب</span><span><b>پایلوت نمایشی</b><small>نمونهٔ علوم آزمایشگاهی · بقیةالله (عج)</small></span></div><div class="desktop-nav-label">فضای آموزشی</div><nav class="desktop-nav">${routes.map(([route, label, glyph]) => `<button class="desktop-nav-item ${active === route ? 'active' : ''}" data-page="${route}" ${active === route ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span>${route === 'admin' ? '<i>پایلوت</i>' : ''}</button>`).join('')}</nav><div class="desktop-sidebar-spacer"></div><button class="desktop-offline" data-page="offline">${icon('bookmark')}<span><b>فهرست شخصی</b><small>عنوان‌های ذخیره‌شده</small></span>${icon('chevron')}</button><button class="desktop-profile" data-page="profile">${studentAvatar()}<span><b>${STUDENT_NAME}</b><small>پروفایل نمونه · ترم ۶</small></span>${icon('chevron')}</button><button class="desktop-logout" data-action="logout">${icon('arrow')} خروج از پیش‌نمایش</button><div class="desktop-sidebar-foot">نمونهٔ تعاملی درس‌بان</div>`;
+    const titles = { home: 'فضای یادگیری', courses: 'دروس نمونهٔ علوم آزمایشگاهی', course: 'نمای کلی درس', library: 'بانک منابع آموزشی', resource: 'جزئیات محتوا', path: 'مسیر مطالعه', mentors: 'راهنمایی و منتورینگ', mentor: 'پروفایل راهنما', support: 'حمایت دانشجویی', assistant: 'دستیار مطالعه', compass: 'قطب‌نمای برنامه‌ریزی', upload: 'پیشنهاد محتوای آموزشی', admin: 'پایش و راهبری محتوا', offline: 'فهرست شخصی', notifications: 'اعلان‌ها', profile: 'پروفایل دانشجو' };
     const pageTitle = $('#desktop-page-title');
     if (pageTitle) pageTitle.textContent = titles[state.page] || titles.home;
+    const desktopUser = $('.desktop-user');
+    if (desktopUser) desktopUser.innerHTML = `<span class="desktop-user-avatar">م</span><span><b>${STUDENT_NAME}</b><small>نمونهٔ علوم آزمایشگاهی · ترم ۶</small></span>`;
   }
 
   function topbarHome() {
@@ -243,6 +258,7 @@
     ['home', 'خانه', 'home'], ['courses', 'درس‌ها', 'book'], ['path', 'مسیر', 'route'], ['mentors', 'منتورها', 'users'], ['profile', 'پروفایل', 'user']
   ];
   function renderTabbar() {
+    if (!state.authenticated) { $('#tabbar').innerHTML = ''; return; }
     const tab = state.page === 'course' || state.page === 'library' || state.page === 'resource' ? 'courses' : state.page === 'mentor' || state.page === 'assistant' || state.page === 'support' ? 'mentors' : ['admin','upload','offline','notifications'].includes(state.page) ? 'profile' : state.page;
     $('#tabbar').innerHTML = tabs.map(([route, label, ic]) => `<button class="tab-item ${tab === route ? 'active' : ''}" data-page="${route}">${icon(ic)}<span>${label}</span></button>`).join('');
   }
@@ -269,14 +285,95 @@
     return `<article class="resource-card card" data-resource="${r.id}"><div class="resource-card-top"><span class="resource-thumb">${icon(r.kind)}</span><div class="resource-card-title"><b>${r.title}</b><span>${courseById(r.course).title} • ${r.type}</span></div><button class="bookmark-btn ${isSaved(r.id) ? 'saved' : ''}" data-action="bookmark" data-id="${r.id}" aria-label="نشان‌کردن">${icon('bookmark')}</button></div><div class="resource-card-meta"><span class="pill gold"><i class="dot"></i>${r.status}</span></div><div class="resource-card-actions"><button class="text-link" data-resource="${r.id}">دیدن جزئیات ${icon('chevron')}</button></div></article>`;
   }
 
+  const landingSlides = [
+    {
+      tone: 'teal', eyebrow: 'درس‌بان؛ برای شروع مسیر دانشگاه',
+      title: 'منابع پراکنده را به یک مسیر روشن تبدیل کن',
+      body: 'بانک منابع، راهنمای مطالعه و همراهی دانشجویی را در یک تجربهٔ منسجم کنار هم ببین.',
+      action: 'ورود به پیش‌نمایش', image: 'hero-study.svg', alt: 'تصویرسازی دانشجویان در حال مطالعه کنار منابع درسی'
+    },
+    {
+      tone: 'coral', eyebrow: 'از دریافت فایل تا یادگیری هدفمند',
+      title: 'هر درس، یک نقشهٔ مطالعهٔ قابل دنبال‌کردن',
+      body: 'محتوا بر اساس دانشگاه، رشته، نیمسال و درس سامان می‌گیرد؛ کنار آن هم مسیر مرور و آمادگی قرار می‌گیرد.',
+      action: 'دیدن امکانات', image: 'hero-resources.svg', alt: 'تصویرسازی کتاب‌ها و مسیر مرور درسی'
+    },
+    {
+      tone: 'cyan', eyebrow: 'هیچ دانشجوی نوورودی تنها نمی‌ماند',
+      title: 'تجربهٔ سال‌بالایی‌ها و مسیر حمایت، کنار درس',
+      body: 'منتورینگ آموزشی و ارجاع روشن به مشاورهٔ دانشگاه، بخش مکمل بانک منابع و راهبری مطالعه است.',
+      action: 'آشنایی با طرح', image: 'hero-mentoring.svg', alt: 'تصویرسازی همراهی دانشجویان در مسیر تحصیل'
+    }
+  ];
+
+  function publicHeader() {
+    return `<header class="public-header"><div class="public-header-main"><button class="public-brand" data-page="landing" aria-label="درس‌بان، صفحهٔ آغاز">${logo()}<span><b>درس‌بان</b><small>منابع و راهبری آموزشی</small></span></button><form class="public-search" id="public-search-form" role="search">${icon('search')}<input id="public-search-input" type="search" data-search="public" placeholder="جست‌وجو بین امکانات درس‌بان" autocomplete="off"><button type="submit" aria-label="جست‌وجو">${icon('arrow')}</button></form><div class="public-account"><button class="public-help" data-scroll="#public-how">راهنما</button><button class="button public-login-button" data-page="login">${icon('user')} ورود به سامانه</button></div></div><nav class="public-nav" aria-label="بخش‌های درس‌بان"><button data-scroll="#public-audience">مخاطبان</button><button data-scroll="#public-features">امکانات</button><button data-scroll="#public-workflow">چرخهٔ محتوا</button><button data-scroll="#public-how">مراحل اجرا</button><span class="public-nav-note">سامانهٔ پیشنهادی برای دانشجویان نوورود علوم پزشکی</span></nav></header>`;
+  }
+
+  function landingScreen() {
+    const shortcuts = [
+      ['layers', 'بانک منابع', 'library', 'blue'],
+      ['route', 'مسیر مطالعه', 'path', 'gold'],
+      ['users', 'منتورینگ', 'mentors', 'coral'],
+      ['heart', 'حمایت دانشجویی', 'support', 'green'],
+      ['upload', 'پیشنهاد محتوا', 'upload', 'blue'],
+      ['chart', 'پایش آموزشی', 'admin', 'gold']
+    ];
+    const audiences = [
+      ['graduation', 'دانشجویان نوورود علوم پزشکی', 'آشنایی با شیوهٔ مطالعهٔ دانشگاهی، درس‌ها و مسیرهای پشتیبانی.'],
+      ['home', 'دانشجویان خوابگاهی و دور از خانواده', 'پیداکردن منابع و راهنمایی روشن در ماه‌های آغازین تحصیل.'],
+      ['users', 'منتورهای دانشجویی', 'انتقال تجربهٔ درسی با چارچوب پاسخ‌گویی و زمان‌بندی مشخص.'],
+      ['chart', 'گروه آموزشی و مدیران', 'بازبینی محتوا و بررسی شاخص‌های استفاده و نیازهای آموزشی.']
+    ];
+    const features = [
+      ['layers', 'بانک منابع آموزشی', 'دسته‌بندی بر پایهٔ دانشگاه، دانشکده، رشته، نیمسال، درس، استاد و سرفصل.'],
+      ['route', 'راهنمای مطالعهٔ درس‌محور', 'گام‌های پیشنهادی برای اولویت‌بندی، مرور و آمادگی ارزیابی هر درس.'],
+      ['users', 'شبکهٔ منتورینگ', 'پروفایل و ارتباط هدایت‌شده با دانشجویان سال‌بالا و آموزش‌دیده.'],
+      ['heart', 'حمایت و ارجاع دانشجویی', 'مسیر روشن برای ارجاع به مرکز مشاوره؛ سامانه جایگزین خدمات تخصصی نیست.'],
+      ['shieldCheck', 'داوری و نگهداری محتوا', 'دریافت، بازبینی، برچسب اعتبار، نسخه‌بندی و بازنگری دوره‌ای منابع.'],
+      ['chart', 'پایش و تصمیم‌سازی', 'اندازه‌گیری زمان دسترسی، استفاده از منابع، تکمیل مسیر و رضایت کاربران.']
+    ];
+    const workflow = [
+      ['01', 'دریافت', 'پیشنهاد منابع از سوی دانشجو، منتور یا گروه آموزشی.'],
+      ['02', 'بازبینی', 'بررسی علمی، هم‌راستایی با درس و مجوز انتشار.'],
+      ['03', 'انتشار', 'نمایش منبع با درس، نوع محتوا، نسخه و سطح اعتبار.'],
+      ['04', 'بازنگری', 'گزارش خطا و به‌روزرسانی مسئولانهٔ محتوا.']
+    ];
+    const phases = [
+      ['ماه ۱ تا ۲', 'نیازسنجی و چارچوب کیفیت', 'گفت‌وگو با دانشجویان و استادان؛ تعریف نقش‌ها، دسته‌بندی و شیوه‌نامهٔ محتوا.'],
+      ['ماه ۳ تا ۵', 'پایلوت محدود', 'راه‌اندازی نسخهٔ اولیه برای چند درس پایه و تشکیل شبکهٔ منتورینگ.'],
+      ['ماه ۶ تا ۹', 'ارزیابی و بهینه‌سازی', 'بررسی استفاده، رضایت، تکمیل مسیر و بازنگری محتوایی.'],
+      ['ماه ۱۰ تا ۱۲', 'تثبیت و توسعه', 'استقرار پایدار، آموزش ادمین‌ها و گسترش مرحله‌ای به ورودی‌ها و دانشکده‌ها.']
+    ];
+    return `<div class="public-site">${publicHeader()}<main>
+      <section class="market-hero" id="public-hero" data-tone="${landingSlides[landingSlideIndex].tone}" aria-label="معرفی درس‌بان">
+        <div class="hero-carousel-track">${landingSlides.map((slide, index) => `<article class="landing-slide ${index === landingSlideIndex ? 'active' : ''}" data-slide="${index}" aria-hidden="${index !== landingSlideIndex}"><div class="landing-copy"><span class="landing-eyebrow"><i></i>${slide.eyebrow}</span><h1>${slide.title}</h1><p>${slide.body}</p><div class="landing-actions"><button class="button landing-cta" data-page="login">${slide.action} ${icon('arrow')}</button><button class="landing-text-link" data-scroll="#public-features">آشنایی با درس‌بان ${icon('chevron')}</button></div><div class="hero-badges"><span>${icon('bookOpen')} منابع ساختارمند</span><span>${icon('users')} راهبری انسانی</span></div></div><div class="landing-visual"><div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div><img src="${slide.image}" alt="${slide.alt}" class="hero-illustration"><span class="visual-chip chip-top">${icon('spark')}یادگیری با راهنما</span><span class="visual-chip chip-bottom">${icon('checkCircle')}مسیر روشن‌تر</span></div></article>`).join('')}</div>
+        <div class="carousel-controls"><button type="button" class="carousel-arrow" data-action="carousel-next" aria-label="اسلاید بعدی">${icon('chevron')}</button><div class="carousel-dots" role="group" aria-label="انتخاب اسلاید">${landingSlides.map((_, index) => `<button type="button" class="carousel-dot ${index === landingSlideIndex ? 'active' : ''}" data-action="carousel-to" data-index="${index}" aria-label="اسلاید ${index + 1}" aria-pressed="${index === landingSlideIndex}"></button>`).join('')}</div><button type="button" class="carousel-pause" data-action="carousel-toggle" aria-label="توقف پخش خودکار">${icon('pause')}</button><button type="button" class="carousel-arrow" data-action="carousel-prev" aria-label="اسلاید قبلی">${icon('chevron')}</button></div>
+      </section>
+      <div class="public-content">
+        <section class="shortcut-rail" aria-label="دسترسی سریع">${shortcuts.map(([glyph,label,page,tone]) => `<button class="shortcut-item" data-page="${page}"><span class="shortcut-icon ${tone}">${icon(glyph)}</span><b>${label}</b></button>`).join('')}</section>
+        <section class="public-section intro-section" id="public-audience"><div class="section-title-line"><div><span class="public-kicker">درس‌بان برای چه کسانی طراحی شده؟</span><h2>یک نقطهٔ شروع مشترک برای جامعهٔ آموزشی علوم پزشکی</h2><p>محور ایده، پشتیبانی از دانشجویان نوورود است؛ با مشارکت منتورها، استادان و مدیران آموزشی.</p></div><span class="section-decoration">${icon('graduation')}</span></div><div class="audience-grid">${audiences.map(([glyph,title,desc]) => `<article class="audience-card" data-public-searchable><span class="audience-icon">${icon(glyph)}</span><h3>${title}</h3><p>${desc}</p></article>`).join('')}</div><div class="field-strip"><span class="field-strip-title">قابل گسترش در دانشکده‌های</span><div class="field-pills"><span>پزشکی</span><span>دندان‌پزشکی</span><span>داروسازی</span><span>پرستاری و مامایی</span><span>پیراپزشکی</span><span>بهداشت و علوم پایه</span></div><small>نمایش این رشته‌ها به‌معنای وجود محتوای تأییدشده برای آن‌ها در نسخهٔ فعلی نیست.</small></div></section>
+        <section class="public-section feature-section" id="public-features"><div class="section-title-line"><div><span class="public-kicker">از محتوا تا راهبری</span><h2>امکاناتی که به هم وصل‌اند</h2><p>درس‌بان فقط محل نگهداری فایل نیست؛ هر منبع به درس، مسیر استفاده و پشتیبانی مرتبط می‌شود.</p></div><button class="button outline" data-page="login">ورود به پیش‌نمایش ${icon('arrow')}</button></div><div class="feature-grid">${features.map(([glyph,title,desc],index) => `<article class="feature-card" data-public-searchable><span class="feature-number">۰${index+1}</span><span class="feature-icon feature-tone-${index+1}">${icon(glyph)}</span><h3>${title}</h3><p>${desc}</p><span class="feature-card-foot">${index===3?'مسیر پیشنهادی':index===4?'چرخهٔ کیفیت':'قابلیت محوری'}</span></article>`).join('')}</div></section>
+        <section class="workflow-section public-section" id="public-workflow"><div class="workflow-heading"><span class="public-kicker">کیفیت محتوا چطور حفظ می‌شود؟</span><h2>هر محتوا از یک چرخهٔ بازبینی می‌گذرد</h2><p>انتشار نهایی پس از بررسی علمی و روشن‌شدن حقوق استفاده انجام می‌شود.</p></div><div class="workflow-grid">${workflow.map(([num,title,desc],index) => `<article class="workflow-card"><span class="workflow-index">${num}</span><div><h3>${title}</h3><p>${desc}</p></div>${index<workflow.length-1?`<span class="workflow-link">${icon('chevron')}</span>`:''}</article>`).join('')}</div></section>
+        <section class="public-section roadmap-section" id="public-how"><div class="section-title-line"><div><span class="public-kicker">روش اجرای پیشنهادی</span><h2>از پایلوت کوچک تا توسعهٔ قابل سنجش</h2><p>زمان‌بندی و مراحل زیر از طرح ایده گرفته شده‌اند؛ نتیجهٔ اجرا یا آمار واقعی نیستند.</p></div><span class="roadmap-stamp">طرح ۱۲ ماهه</span></div><div class="roadmap-grid">${phases.map(([time,title,desc],index) => `<article class="roadmap-card" data-public-searchable><span class="roadmap-step">گام ${index+1}</span><span class="roadmap-time">${time}</span><h3>${title}</h3><p>${desc}</p></article>`).join('')}</div></section>
+        <section class="measurement-band"><div><span class="public-kicker">پایش اثر آموزشی</span><h2>موفقیت را با چه چیزی می‌سنجیم؟</h2><p>شاخص‌ها پیش‌بینی‌شده‌اند؛ در این پیش‌نمایش دادهٔ مصرف واقعی ثبت نمی‌شود.</p></div><div class="measurement-points"><span>${icon('clock')}زمان پیدا کردن منبع</span><span>${icon('route')}تکمیل مسیر مطالعه</span><span>${icon('smile')}رضایت دانشجو و منتور</span><span>${icon('chart')}دسترسی پایدار و نرخ استفاده</span></div></section>
+        <section class="public-cta"><div><span class="public-kicker">نسخهٔ تعاملی</span><h2>ظاهر و مسیرهای اصلی درس‌بان را ببین</h2><p>برای ورود به پنل نمونه از حساب نمایشی استفاده کن. این ورود، حساب واقعی دانشگاهی نیست.</p></div><button class="button cta-white" data-page="login">ورود به پیش‌نمایش ${icon('arrow')}</button></section>
+      </div>
+    </main><footer class="public-footer"><div class="footer-brand">${logo()}<b>درس‌بان</b></div><span>سامانهٔ پیشنهادی بانک منابع آموزشی و راهبری دانشجویان نوورود علوم پزشکی</span><button data-page="login">ورود به پیش‌نمایش</button><small>این وب‌سایت نمونهٔ رابط کاربری است؛ ارسال محتوا، درخواست منتور و آمار واقعی هنوز به سامانهٔ پشتیبان متصل نیست.</small></footer></div>`;
+  }
+
+  function loginScreen() {
+    return `<div class="login-site">${publicHeader()}<main class="login-layout"><section class="login-intro"><span class="public-kicker">فضای نمونهٔ درس‌بان</span><h1>از همین‌جا مسیر یادگیری را ببین</h1><p>با حساب نمایشی وارد شو و صفحه‌های بانک منابع، برنامه‌ریزی مطالعه، منتورینگ و حمایت دانشجویی را مرور کن.</p><img src="hero-mentoring.svg" alt="تصویرسازی گفت‌وگوی آموزشی دو دانشجو" class="login-illustration"><div class="login-points"><span>${icon('layers')}بانک منابع</span><span>${icon('route')}مسیر مطالعه</span><span>${icon('users')}راهنمای درسی</span></div></section><section class="login-card"><button class="back-to-public" data-page="landing">${icon('back')} بازگشت به صفحهٔ اصلی</button><div class="login-mark">${logo()}</div><span class="public-kicker">ورود به پیش‌نمایش</span><h2>خوش آمدی</h2><p class="login-lede">نام کاربری و رمز نمونه را وارد کن تا پنل نمایشی باز شود.</p><form id="login-form" class="login-form"><label for="demo-username">نام کاربری</label><input id="demo-username" name="username" autocomplete="username" placeholder="نام کاربری نمونه" required><label for="demo-password">کلمهٔ عبور</label><input id="demo-password" name="password" type="password" autocomplete="current-password" placeholder="کلمهٔ عبور نمونه" required><button class="button full login-submit" type="submit">ورود به سامانه ${icon('arrow')}</button></form><div class="demo-credentials"><b>${icon('info')} حساب پیش‌فرض پیش‌نمایش</b><div><span>نام کاربری</span><code>${DEMO_CREDENTIALS.username}</code></div><div><span>کلمهٔ عبور</span><code>${DEMO_CREDENTIALS.password}</code></div></div><p class="login-notice">ورود این صفحه نمایشی و فقط در همین مرورگر است؛ اطلاعات ورود داخل فایل عمومی سایت قرار دارد و برای حساب یا دادهٔ واقعی امن نیست. ثبت‌نام و اتصال به حساب دانشگاهی فعال نشده است.</p></section></main><footer class="login-footer">درس‌بان · پیش‌نمایش گرافیکی و تعاملی</footer></div>`;
+  }
+
   function homeScreen() {
     const top = topbarHome();
     const content = `<div class="home-intro">
-      <div class="greeting"><div><div class="eyebrow">دانشگاه علوم پزشکی بقیةالله (عج) • ورودی ۱۴۰۲</div><h1 class="h1">سلام، محمدرضا 🌿</h1><div class="welcome-note">درس‌های علوم آزمایشگاهی را مرور کن و برای مطالعه برنامه بچین.</div></div><span class="term-chip">${icon('microscope')} علوم آزمایشگاهی</span></div>
-      <section class="hero"><div class="hero-content"><div class="eyebrow">درس‌بان • علوم آزمایشگاهی</div><h2>برای مطالعهٔ امروز<br>از کجا شروع کنیم؟</h2><p>درس را انتخاب کن و یک مسیر کوتاه برای مرور بساز.</p><button class="button" data-page="compass">برنامه‌ریزی مطالعه ${icon('compass')}</button></div><div class="hero-art"><i class="orbit"></i><i class="book"></i><b class="spark">✦</b></div></section>
+      <div class="greeting"><div><div class="eyebrow">پایلوت نمایشی علوم آزمایشگاهی • بقیةالله (عج)</div><h1 class="h1">سلام، ${STUDENT_NAME} 🌿</h1><div class="welcome-note">این پنل، نمونهٔ یک پایلوت رشته‌ای است؛ ایدهٔ درس‌بان برای دانشجویان نوورود همهٔ رشته‌های علوم پزشکی طراحی شده است.</div></div><span class="term-chip">${icon('microscope')} علوم آزمایشگاهی</span></div>
+      <section class="hero"><div class="hero-content"><div class="eyebrow">پایلوت نمونهٔ درس‌بان</div><h2>برای مطالعهٔ امروز<br>از کجا شروع کنیم؟</h2><p>درس را انتخاب کن و یک مسیر کوتاه برای مرور بساز.</p><button class="button" data-page="compass">برنامه‌ریزی مطالعه ${icon('compass')}</button></div><div class="hero-art"><i class="orbit"></i><i class="book"></i><b class="spark">✦</b></div></section>
       <div class="stat-row"><div class="stat-card"><span class="stat-icon">${icon('book')}</span><div><div class="stat-value">${resources.length.toLocaleString('fa-IR')}</div><div class="stat-label">قالب پیشنهادی محتوا</div></div></div><div class="stat-card"><span class="stat-icon coral-bg">${icon('users')}</span><div><div class="stat-value">${mentors.length.toLocaleString('fa-IR')}</div><div class="stat-label">حوزهٔ راهنمایی نمایشی</div></div></div><div class="stat-card"><span class="stat-icon gold-bg">${icon('microscope')}</span><div><div class="stat-value">${courses.length.toLocaleString('fa-IR')}</div><div class="stat-label">عنوان درسی</div></div></div></div>
       <section class="section"><div class="section-head"><h2 class="h2">قطب‌نمای یادگیری</h2><span class="pill gold">برنامه‌ریزی شخصی</span></div><button class="compass-card card" data-page="compass" style="width:100%;text-align:right"><span class="compass-badge">${icon('compass')}</span><span class="compass-copy"><b>برای مطالعه برنامه بچین</b><span>درس، نیاز و زمانت را انتخاب کن.</span></span><span class="course-card-open">شروع ${icon('back')}</span></button></section>
-      <section class="section"><div class="section-head"><h2 class="h2">درس‌های علوم آزمایشگاهی</h2><button class="text-link" data-page="courses">دیدن فهرست ${icon('chevron')}</button></div><div class="course-strip">${courses.slice(0,4).map(c => `<button class="course-mini" data-course="${c.id}"><span class="course-mini-top">${courseSymbol(c)}</span><span class="course-name">${c.title}</span><span class="course-meta">${c.subtitle}</span></button>`).join('')}</div></section>
+      <section class="section"><div class="section-head"><h2 class="h2">درس‌های نمونهٔ علوم آزمایشگاهی</h2><button class="text-link" data-page="courses">دیدن فهرست ${icon('chevron')}</button></div><div class="course-strip">${courses.slice(0,4).map(c => `<button class="course-mini" data-course="${c.id}"><span class="course-mini-top">${courseSymbol(c)}</span><span class="course-name">${c.title}</span><span class="course-meta">${c.subtitle}</span></button>`).join('')}</div></section>
       <section class="section"><div class="section-head"><h2 class="h2">طرح‌های محتوایی پیشنهادی</h2><button class="text-link" data-page="library">دیدن همه ${icon('chevron')}</button></div><div class="feature-list">${resources.filter(r => ['hematology-1','mycology'].includes(r.course)).map(r => `<div class="resource-row card" data-resource="${r.id}"><span class="resource-thumb">${icon(r.kind)}</span><span class="resource-info"><b>${r.title}</b><span>${courseById(r.course).title} • ${r.status}</span></span><span class="resource-row-open">جزئیات ${icon('bookOpen')}</span></div>`).join('')}</div></section>
       <section class="section"><div class="section-head"><h2 class="h2">راهنمای درسی</h2><button class="text-link" data-page="mentors">دیدن پروفایل‌ها ${icon('chevron')}</button></div><div class="mentor-preview"><span class="avatar coral-avatar">${mentors[0].initial}</span><span class="mentor-copy"><b>${mentors[0].name}</b><p>حوزهٔ همراهی: ${mentors[0].specialty} · نمونه</p></span><button class="button secondary" data-mentor="m1">مشاهده</button></div></section>
       <section class="section"><button class="offline-banner" style="width:100%;text-align:right;border:0" data-page="offline">${icon('bookmark')}<span><b>فهرست ذخیره‌شده</b><span>عنوان‌هایی را که نشان کرده‌ای، اینجا ببین.</span></span><span class="resource-row-open">مشاهده ${icon('chevron')}</span></button></section>
@@ -407,6 +504,8 @@
 
   function pageContent() {
     switch (state.page) {
+      case 'landing': return landingScreen();
+      case 'login': return loginScreen();
       case 'home': return homeScreen();
       case 'courses': return coursesScreen();
       case 'course': return courseScreen();
@@ -427,15 +526,48 @@
     }
   }
 
+  function selectLandingSlide(index) {
+    landingSlideIndex = (index + landingSlides.length) % landingSlides.length;
+    const hero = $('#public-hero');
+    if (!hero) return;
+    hero.dataset.tone = landingSlides[landingSlideIndex].tone;
+    $$('.landing-slide', hero).forEach((slide, i) => {
+      const active = i === landingSlideIndex;
+      slide.classList.toggle('active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+    });
+    $$('.carousel-dot', hero).forEach((dot, i) => {
+      const active = i === landingSlideIndex;
+      dot.classList.toggle('active', active);
+      dot.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  function startLandingCarousel() {
+    clearInterval(landingCarouselTimer);
+    landingCarouselTimer = undefined;
+    if (state.page !== 'landing' || state.carouselPaused || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    landingCarouselTimer = setInterval(() => selectLandingSlide(landingSlideIndex + 1), 6500);
+  }
+
   function render() {
     $('#view').innerHTML = pageContent();
     renderTabbar();
     renderDesktopChrome();
     window.scrollTo(0, 0);
     $('#modal-root').innerHTML = '';
+    startLandingCarousel();
   }
 
   function go(page, data = {}) {
+    const privatePages = new Set(['home','courses','course','library','resource','path','mentors','mentor','support','assistant','compass','upload','admin','offline','notifications','profile']);
+    if (privatePages.has(page) && !state.authenticated) {
+      state.returnPage = page;
+      state.returnData = data;
+      state.previous.push({ page: state.page, courseTab: state.courseTab, filter: state.filter });
+      state.page = 'login';
+      return render();
+    }
     state.previous.push({ page: state.page, courseTab: state.courseTab, filter: state.filter });
     state.page = page;
     Object.assign(state, data);
@@ -492,6 +624,24 @@
   function activateAction(action, el) {
     const id = el.dataset.id;
     if (action === 'back') return back();
+    if (action === 'logout') {
+      state.authenticated = false;
+      state.page = 'landing';
+      state.previous = [];
+      state.returnPage = null;
+      state.returnData = null;
+      state.carouselPaused = false;
+      return render();
+    }
+    if (action === 'carousel-next') { state.carouselPaused = false; selectLandingSlide(landingSlideIndex + 1); return startLandingCarousel(); }
+    if (action === 'carousel-prev') { state.carouselPaused = false; selectLandingSlide(landingSlideIndex - 1); return startLandingCarousel(); }
+    if (action === 'carousel-to') { state.carouselPaused = false; selectLandingSlide(Number(el.dataset.index) || 0); return startLandingCarousel(); }
+    if (action === 'carousel-toggle') {
+      state.carouselPaused = !state.carouselPaused;
+      el.innerHTML = icon(state.carouselPaused ? 'play' : 'pause');
+      el.setAttribute('aria-label', state.carouselPaused ? 'ادامهٔ پخش خودکار' : 'توقف پخش خودکار');
+      return startLandingCarousel();
+    }
     if (action === 'bookmark') {
       const s = savedItems();
       store.set('saved', s.includes(id) ? s.filter(x=>x!==id) : [...s,id]);
@@ -535,7 +685,7 @@
       toast('فرم فقط نمایشی است؛ محتوا به سامانه ارسال نشد.'); return;
     }
     if (action === 'clear-notifications') return toast('اعلان‌ها خوانده شدند');
-    if (action === 'share') return toast('برای اشتراک‌گذاری، ابتدا وب‌اپ را میزبانی کن.');
+    if (action === 'share') return toast('این نسخهٔ نمایشی به سرویس اشتراک‌گذاری متصل نیست.');
     if (action === 'global-search') {
       state.courseQuery = $('#global-search')?.value.trim() || '';
       return go('courses');
@@ -545,8 +695,13 @@
 
   document.addEventListener('click', event => {
     if (event.target.closest('.modal') && !event.target.closest('.modal [data-action], .modal [data-page], .modal [data-course], .modal [data-resource], .modal [data-mentor]')) return;
-    const el = event.target.closest('[data-page],[data-course],[data-resource],[data-mentor],[data-action],[data-course-tab],[data-filter],[data-answer],[data-chat]');
+    const el = event.target.closest('[data-page],[data-course],[data-resource],[data-mentor],[data-action],[data-course-tab],[data-filter],[data-answer],[data-chat],[data-scroll]');
     if (!el) return;
+    if (el.dataset.scroll) {
+      event.preventDefault();
+      document.querySelector(el.dataset.scroll)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     if (el.dataset.page) return go(el.dataset.page);
     if (el.dataset.course) return go('course',{courseId:el.dataset.course});
     if (el.dataset.resource) return go('resource',{resourceId:el.dataset.resource});
@@ -576,9 +731,38 @@
       const q = el.value.trim();
       $$('#resource-list .resource-card').forEach((row) => row.style.display = row.textContent.includes(q) ? 'block' : 'none');
     }
+    if (el.dataset.search === 'public') {
+      const q = el.value.trim().toLocaleLowerCase();
+      $$('[data-public-searchable]').forEach((card) => { card.hidden = q !== '' && !card.textContent.toLocaleLowerCase().includes(q); });
+    }
   });
 
   document.addEventListener('submit', event => {
+    if (event.target.id === 'login-form') {
+      event.preventDefault();
+      const form = event.target;
+      const username = form.elements.username.value.trim();
+      const password = form.elements.password.value;
+      if (username !== DEMO_CREDENTIALS.username || password !== DEMO_CREDENTIALS.password) {
+        toast('نام کاربری یا کلمهٔ عبور نمونه درست نیست.');
+        return;
+      }
+      state.authenticated = true;
+      state.page = state.returnPage || 'home';
+      Object.assign(state, state.returnData || {});
+      state.returnPage = null;
+      state.returnData = null;
+      state.previous = [];
+      render();
+      toast('وارد پیش‌نمایش درس‌بان شدی.');
+      return;
+    }
+    if (event.target.id === 'public-search-form') {
+      event.preventDefault();
+      const q = $('#public-search-input')?.value.trim();
+      if (q) $('#public-features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     if (event.target.id === 'chat-form') {
       event.preventDefault();
       const input = $('#chat-text');
