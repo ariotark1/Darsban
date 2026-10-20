@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" role="img" aria-labelledby="title desc">
+  <title id="title">منابع آموزشی دسته‌بندی‌شده</title>
+  <desc id="desc">کتاب، برگه‌های مرور و مسیر آموزشی در یک تصویرسازی رنگی</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1df"/><stop offset="1" stop-color="#ffd9c8"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="13" stdDeviation="12" flood-color="#793b30" flood-opacity=".16"/></filter>
+  </defs>
+  <circle cx="318" cy="217" r="179" fill="url(#bg)"/>
+  <circle cx="455" cy="96" r="37" fill="#fff" opacity=".55"/><circle cx="155" cy="328" r="22" fill="#f3b962" opacity=".72"/>
+  <g filter="url(#shadow)" transform="rotate(-7 315 242)">
+    <rect x="179" y="119" width="271" height="221" rx="22" fill="#fff"/>
+    <rect x="179" y="119" width="271" height="55" rx="22" fill="#25685e"/><path d="M179 153h271v20H179z" fill="#25685e"/>
+    <circle cx="210" cy="147" r="6" fill="#f4c66b"/><circle cx="231" cy="147" r="6" fill="#fff" opacity=".72"/>
+    <rect x="204" y="194" width="83" height="106" rx="12" fill="#fff2d8"/>
+    <path d="M246 212c-13 15-21 29-21 41a21 21 0 0 0 42 0c0-12-8-26-21-41Z" fill="#e47e65"/><path d="M233 255c4 7 11 11 19 9" fill="none" stroke="#fff1e8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M307 201h108M307 222h88M307 243h97" stroke="#d7e3dc" stroke-width="8" stroke-linecap="round"/>
+    <rect x="307" y="269" width="111" height="31" rx="10" fill="#e8f4ee"/><path d="m322 284 7 7 13-15" fill="none" stroke="#267b6a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M352 285h50" stroke="#82a99c" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#shadow)" transform="rotate(8 132 241)">
+    <rect x="80" y="187" width="116" height="143" rx="14" fill="#fff"/>
+    <rect x="80" y="187" width="116" height="25" rx="14" fill="#e8b75a"/><path d="M80 201h116v11H80z" fill="#e8b75a"/>
+    <path d="M104 232h66m-66 18h51m-51 18h59m-59 18h42" stroke="#ded5c5" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="171" cy="303" r="13" fill="#e8f2eb"/><path d="m165 303 4 4 8-9" fill="none" stroke="#367c6c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(421 308)"><circle cx="38" cy="38" r="38" fill="#fff" opacity=".92"/><path d="M26 49V26h24v23m-30 0h36m-30-12h24m-16-12v23" fill="none" stroke="#2e7c70" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 26c1-8 11-10 15-3" fill="none" stroke="#e68866" stroke-width="4" stroke-linecap="round"/></g>
+  <path d="m123 105 7-16 7 16 16 7-16 7-7 16-7-16-16-7zm381 78 5-12 5 12 12 5-12 5-5 12-5-12-12-5z" fill="#ebbd63"/>
+</svg>
