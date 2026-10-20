@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" role="img" aria-labelledby="title desc">
+  <title id="title">گفت‌وگوی آموزشی دانشجویان</title>
+  <desc id="desc">دو دانشجو با یک کتاب باز و گفت‌وگوی آموزشی دوستانه</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2f5f6"/><stop offset="1" stop-color="#b8e4e9"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#174e62" flood-opacity=".15"/></filter>
+  </defs>
+  <circle cx="320" cy="214" r="179" fill="url(#bg)"/><circle cx="448" cy="96" r="35" fill="#fff" opacity=".65"/><circle cx="153" cy="112" r="15" fill="#f0bd5e"/>
+  <path d="M105 361c21-49 65-72 120-72h178c59 0 98 23 117 72v27H105z" fill="#8dc7cf"/>
+  <g filter="url(#shadow)">
+    <rect x="211" y="251" width="198" height="43" rx="15" fill="#fff"/>
+    <path d="M310 260c-22-11-44-10-62 0v23c18-9 40-10 62 0zm0 0c22-11 44-10 62 0v23c-18-9-40-10-62 0z" fill="#fff5dc" stroke="#d8c994" stroke-width="2"/>
+    <path d="M267 269h28m31 0h28" stroke="#c7b985" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g>
+    <path d="M115 367c6-49 31-74 72-74 40 0 63 24 69 74z" fill="#23756d"/>
+    <ellipse cx="185" cy="247" rx="37" ry="45" fill="#efc2a5"/><path d="M147 244c-3-39 16-60 42-60 30 0 44 22 40 59-12-5-25-19-29-34-12 19-29 30-53 35" fill="#273e3b"/><circle cx="173" cy="251" r="2.5" fill="#344640"/><circle cx="197" cy="251" r="2.5" fill="#344640"/><path d="M174 269c7 6 16 6 23 0" stroke="#a75d55" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M152 300c16-12 50-15 67-1l13 68h-88z" fill="#f9fcfa"/><path d="m183 300 9 16 10-16 11 6-13 61h-17l-13-61z" fill="#e6ad52"/>
+  </g>
+  <g>
+    <path d="M365 367c5-49 28-74 68-74 41 0 65 25 70 74z" fill="#e78b69"/>
+    <ellipse cx="431" cy="247" rx="37" ry="45" fill="#d99975"/><path d="M393 243c-2-39 17-59 42-59 30 0 44 23 39 59-13-4-26-18-30-34-11 19-28 30-51 34" fill="#203a3b"/><circle cx="419" cy="251" r="2.5" fill="#344640"/><circle cx="443" cy="251" r="2.5" fill="#344640"/><path d="M420 269c7 6 16 6 23 0" stroke="#8d4f46" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M398 301c19-13 47-14 67-1l15 67h-95z" fill="#e7f2f6"/><path d="m432 300 10 16 10-16 11 6-13 61h-17l-13-61z" fill="#316d87"/>
+  </g>
+  <g transform="translate(256 94)"><rect width="102" height="54" rx="18" fill="#fff" opacity=".95"/><circle cx="27" cy="27" r="8" fill="#e9966f"/><circle cx="50" cy="27" r="8" fill="#48a7a9"/><circle cx="73" cy="27" r="8" fill="#e5bd61"/></g>
+  <g transform="translate(85 166)"><circle cx="34" cy="34" r="34" fill="#fff" opacity=".9"/><path d="M18 23h32v24H31l-10 8v-8h-3z" fill="none" stroke="#3c8b8f" stroke-width="4" stroke-linejoin="round"/><path d="M25 31h18m-18 8h12" stroke="#e48768" stroke-width="3" stroke-linecap="round"/></g>
+  <path d="m491 174 6-14 6 14 14 6-14 6-6 14-6-14-14-6zm-367 56 4-10 4 10 10 4-10 4-4 10-4-10-10-4z" fill="#efc45f"/>
+</svg>
