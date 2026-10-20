@@ -290,19 +290,19 @@
       tone: 'teal', eyebrow: 'درس‌بان؛ برای شروع مسیر دانشگاه',
       title: 'منابع پراکنده را به یک مسیر روشن تبدیل کن',
       body: 'بانک منابع، راهنمای مطالعه و همراهی دانشجویی را در یک تجربهٔ منسجم کنار هم ببین.',
-      action: 'ورود به پیش‌نمایش', image: 'hero-study.svg', alt: 'تصویرسازی دانشجویان در حال مطالعه کنار منابع درسی'
+      action: 'ورود به پیش‌نمایش', actionPage: 'login', image: 'hero-study.svg', alt: 'تصویرسازی دانشجویان در حال مطالعه کنار منابع درسی'
     },
     {
       tone: 'coral', eyebrow: 'از دریافت فایل تا یادگیری هدفمند',
       title: 'هر درس، یک نقشهٔ مطالعهٔ قابل دنبال‌کردن',
       body: 'محتوا بر اساس دانشگاه، رشته، نیمسال و درس سامان می‌گیرد؛ کنار آن هم مسیر مرور و آمادگی قرار می‌گیرد.',
-      action: 'دیدن امکانات', image: 'hero-resources.svg', alt: 'تصویرسازی کتاب‌ها و مسیر مرور درسی'
+      action: 'دیدن امکانات', actionScroll: '#public-features', image: 'hero-resources.svg', alt: 'تصویرسازی کتاب‌ها و مسیر مرور درسی'
     },
     {
       tone: 'cyan', eyebrow: 'هیچ دانشجوی نوورودی تنها نمی‌ماند',
       title: 'تجربهٔ سال‌بالایی‌ها و مسیر حمایت، کنار درس',
       body: 'منتورینگ آموزشی و ارجاع روشن به مشاورهٔ دانشگاه، بخش مکمل بانک منابع و راهبری مطالعه است.',
-      action: 'آشنایی با طرح', image: 'hero-mentoring.svg', alt: 'تصویرسازی همراهی دانشجویان در مسیر تحصیل'
+      action: 'آشنایی با طرح', actionScroll: '#public-how', image: 'hero-mentoring.svg', alt: 'تصویرسازی همراهی دانشجویان در مسیر تحصیل'
     }
   ];
 
@@ -347,7 +347,7 @@
     ];
     return `<div class="public-site">${publicHeader()}<main>
       <section class="market-hero" id="public-hero" data-tone="${landingSlides[landingSlideIndex].tone}" aria-label="معرفی درس‌بان">
-        <div class="hero-carousel-track">${landingSlides.map((slide, index) => `<article class="landing-slide ${index === landingSlideIndex ? 'active' : ''}" data-slide="${index}" aria-hidden="${index !== landingSlideIndex}"><div class="landing-copy"><span class="landing-eyebrow"><i></i>${slide.eyebrow}</span><h1>${slide.title}</h1><p>${slide.body}</p><div class="landing-actions"><button class="button landing-cta" data-page="login">${slide.action} ${icon('arrow')}</button><button class="landing-text-link" data-scroll="#public-features">آشنایی با درس‌بان ${icon('chevron')}</button></div><div class="hero-badges"><span>${icon('bookOpen')} منابع ساختارمند</span><span>${icon('users')} راهبری انسانی</span></div></div><div class="landing-visual"><div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div><img src="${slide.image}" alt="${slide.alt}" class="hero-illustration"><span class="visual-chip chip-top">${icon('spark')}یادگیری با راهنما</span><span class="visual-chip chip-bottom">${icon('checkCircle')}مسیر روشن‌تر</span></div></article>`).join('')}</div>
+        <div class="hero-carousel-track">${landingSlides.map((slide, index) => `<article class="landing-slide ${index === landingSlideIndex ? 'active' : ''}" data-slide="${index}" aria-hidden="${index !== landingSlideIndex}"><div class="landing-copy"><span class="landing-eyebrow"><i></i>${slide.eyebrow}</span><h1>${slide.title}</h1><p>${slide.body}</p><div class="landing-actions"><button class="button landing-cta" ${slide.actionPage ? `data-page="${slide.actionPage}"` : `data-scroll="${slide.actionScroll}"`}>${slide.action} ${icon('arrow')}</button><button class="landing-text-link" data-scroll="#public-features">آشنایی با درس‌بان ${icon('chevron')}</button></div><div class="hero-badges"><span>${icon('bookOpen')} منابع ساختارمند</span><span>${icon('users')} راهبری انسانی</span></div></div><div class="landing-visual"><div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div><img src="${slide.image}" alt="${slide.alt}" class="hero-illustration"><span class="visual-chip chip-top">${icon('spark')}یادگیری با راهنما</span><span class="visual-chip chip-bottom">${icon('checkCircle')}مسیر روشن‌تر</span></div></article>`).join('')}</div>
         <div class="carousel-controls"><button type="button" class="carousel-arrow" data-action="carousel-next" aria-label="اسلاید بعدی">${icon('chevron')}</button><div class="carousel-dots" role="group" aria-label="انتخاب اسلاید">${landingSlides.map((_, index) => `<button type="button" class="carousel-dot ${index === landingSlideIndex ? 'active' : ''}" data-action="carousel-to" data-index="${index}" aria-label="اسلاید ${index + 1}" aria-pressed="${index === landingSlideIndex}"></button>`).join('')}</div><button type="button" class="carousel-pause" data-action="carousel-toggle" aria-label="توقف پخش خودکار">${icon('pause')}</button><button type="button" class="carousel-arrow" data-action="carousel-prev" aria-label="اسلاید قبلی">${icon('chevron')}</button></div>
       </section>
       <div class="public-content">
