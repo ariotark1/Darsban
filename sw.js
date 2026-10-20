@@ -1,11 +1,14 @@
-const CACHE_NAME = 'darsban-shell-v1';
+const CACHE_NAME = 'darsban-shell-v2';
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.svg',
+  './hero-study.svg',
+  './hero-resources.svg',
+  './hero-mentoring.svg'
 ];
 
 self.addEventListener('install', event => {
