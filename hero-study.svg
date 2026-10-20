@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" role="img" aria-labelledby="title desc">
+  <title id="title">دانشجویان در حال مطالعه</title>
+  <desc id="desc">دو دانشجو با کتاب و رایانه در فضای آرام مطالعه</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e7"/><stop offset="1" stop-color="#c7e8d9"/></linearGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#e5f3ed"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#123d37" flood-opacity=".14"/></filter>
+  </defs>
+  <circle cx="315" cy="213" r="178" fill="url(#panel)"/>
+  <circle cx="442" cy="88" r="35" fill="#fff" opacity=".65"/><circle cx="140" cy="294" r="19" fill="#efa36e" opacity=".72"/>
+  <path d="M144 341c47-56 117-81 210-75 65 4 126 35 157 88v36H145z" fill="#b5dccc"/>
+  <g filter="url(#shadow)">
+    <rect x="212" y="128" width="252" height="161" rx="18" fill="#214f4c"/>
+    <rect x="224" y="140" width="228" height="136" rx="11" fill="#f7fbf8"/>
+    <rect x="241" y="158" width="96" height="86" rx="10" fill="#e7f1ed"/>
+    <path d="M264 222v-20l14-13 14 13v20m-21 0v-15h14v15" fill="none" stroke="#3d8b78" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M355 169h73M355 185h58M355 201h67M355 217h45" stroke="#b8c9c0" stroke-width="7" stroke-linecap="round"/>
+    <rect x="190" y="284" width="296" height="16" rx="8" fill="#173a39"/>
+  </g>
+  <g>
+    <path d="M76 361c6-45 27-71 62-76 36-5 61 18 69 76z" fill="#f4a27d"/>
+    <path d="M104 285c0-35 16-55 44-55s42 22 42 55c-16 14-59 17-86 0" fill="#283e3b"/>
+    <ellipse cx="148" cy="269" rx="31" ry="37" fill="#edbd9f"/>
+    <path d="M114 263c1-39 21-58 47-56 22 2 33 20 31 46-18-5-31-17-37-30-9 20-22 31-41 40" fill="#243b38"/>
+    <circle cx="137" cy="271" r="2.3" fill="#374440"/><circle cx="159" cy="271" r="2.3" fill="#374440"/><path d="M139 287c6 5 13 5 19 0" fill="none" stroke="#ad6658" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M100 314c16-13 45-17 67-6l16 53H89z" fill="url(#coat)"/>
+    <path d="m135 309 13 18 12-18 8 6-13 46h-18l-13-46z" fill="#317d70"/>
+  </g>
+  <g transform="rotate(-9 476 327)" filter="url(#shadow)">
+    <rect x="421" y="285" width="131" height="83" rx="10" fill="#fff"/>
+    <path d="M486 298c-17-8-35-7-49 0v52c15-7 32-7 49 0zm0 0c17-8 35-7 49 0v52c-15-7-32-7-49 0z" fill="#f8efda" stroke="#d4c6a1" stroke-width="2"/>
+    <path d="M447 312h27m-27 11h25m39-11h27m-27 11h25" stroke="#bcae8d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(474 107)">
+    <circle cx="35" cy="35" r="35" fill="#fff" opacity=".9"/>
+    <path d="M35 17v36M17 35h36" stroke="#e98668" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <path d="m106 122 8-18 8 18 18 8-18 8-8 18-8-18-18-8zm370 117 5-11 5 11 11 5-11 5-5 11-5-11-11-5z" fill="#e8bd67"/>
+</svg>
